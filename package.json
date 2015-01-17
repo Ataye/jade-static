@@ -1,6 +1,6 @@
 {
   "name": "jade-static",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "scripts": {
     "test": "mocha test/*.spec.coffee",
     "pretest": "coffee --bare --output ./lib --compile ./src/*.coffee"
@@ -26,6 +26,10 @@
     {
       "name": "Alex Gorbatchev",
       "url": "http://github.com/alexgorbatchev/"
+    },
+    {
+      "name": "Ronald Jerez",
+      "url": "http://github.com/dlanor15/"
     }
   ],
   "licenses": [
