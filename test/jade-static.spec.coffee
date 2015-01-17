@@ -43,3 +43,8 @@ describe 'jade-static', ->
       .end (err, res) ->
         assert.ok /\s<\/div>$/.test(res.text), 'Output does not contain whitespace'
         done()
+
+  it 'ignores query strings', (done) ->
+    request
+      .get '/mount/index.html?foo=bar'
+      .expect 200, done

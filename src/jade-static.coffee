@@ -51,7 +51,7 @@ module.exports = (options) ->
     return (req, res, next) ->
 
         # The inputed url relative to the path.
-        d = path.join options.src, req.url
+        d = path.join options.src, req.url.split('?')[0]
 
         # Determines what d is.
         fs.lstat d, (err, stats) ->
