@@ -3,7 +3,7 @@ fs = require 'fs'
 jade = require 'jade'
 
 
-readAndSendTemplate = (d, res, next) ->
+readAndSendTemplate = (d, options, res, next) ->
 
     # Read the jade file.
     fs.readFile d, 'utf8', (err, data) ->
@@ -13,21 +13,26 @@ readAndSendTemplate = (d, res, next) ->
             return next()
 
         try
-            template = jade.compile data, filename: d
+            unless options?
+                options = filename: d
+            else
+                options.filename = d
+
+            template = jade.compile data, options
             html = template {}
             res.send html, 'Content-Type': 'text/html', 200
         catch err
             next err
 
 
-checkFileAndProcess = (d, res, next) ->
+checkFileAndProcess = (d, options, res, next) ->
 
     # Check if file is exists
     fs.lstat d, (err, stats) ->
 
         # If it exists, then we got ourselves a jade file.
         if not err? and stats.isFile()
-            readAndSendTemplate d, res, next
+            readAndSendTemplate d, options, res, next
         else
             next()
 
@@ -46,7 +51,7 @@ module.exports = (options) ->
     return (req, res, next) ->
 
         # The inputed url relative to the path.
-        d = path.join options.src, req.url
+        d = path.join options.src, req.url.split('?')[0]
 
         # Determines what d is.
         fs.lstat d, (err, stats) ->
@@ -55,15 +60,15 @@ module.exports = (options) ->
             if not err? and stats.isDirectory()
 
                 # If so, check if there is exists a file called index.jade.
-                checkFileAndProcess "#{d}/index.jade", res, next
+                checkFileAndProcess "#{d}/index.jade", options.jade, res, next
 
             else if not err? and stats.isFile() and path.extname(d) is '.jade'
-                readAndSendTemplate d, res, next
+                readAndSendTemplate d, options.jade, res, next
                 
             # try to replace html file by jade template
             else if options.html? and path.extname(d) is '.html'
 
                 # check template exists
-                checkFileAndProcess d.replace(/html$/, 'jade'), res, next
+                checkFileAndProcess d.replace(/html$/, 'jade'), options.jade, res, next
             else
                 next()
